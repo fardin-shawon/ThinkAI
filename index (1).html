@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ThinkAI — Use AI Wisely</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Manrope:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink: #0f0e0c;
+    --paper: #f5f0e8;
+    --cream: #ede7d9;
+    --amber: #d4822a;
+    --amber-light: #f0a94e;
+    --teal: #1a6b6b;
+    --teal-light: #2a9d8f;
+    --red: #c0392b;
+    --muted: #6b6457;
+    --border: #c8bfae;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Manrope', sans-serif;
+    font-weight: 400;
+    overflow-x: hidden;
+    cursor: default;
+  }
+
+  /* ── NOISE OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.5;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.2rem 3rem;
+    background: var(--paper);
+    border-bottom: 1.5px solid var(--border);
+    backdrop-filter: blur(8px);
+  }
+
+  .nav-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.8rem;
+    letter-spacing: 0.08em;
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .nav-logo span { color: var(--amber); }
+
+  .nav-links { display: flex; gap: 2rem; list-style: none; }
+  .nav-links a {
+    font-size: 0.82rem; font-weight: 500; letter-spacing: 0.12em;
+    text-transform: uppercase; text-decoration: none;
+    color: var(--muted);
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--amber); }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding-top: 80px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-left {
+    display: flex; flex-direction: column; justify-content: center;
+    padding: 5rem 3rem 5rem 5rem;
+    position: relative; z-index: 2;
+  }
+
+  .hero-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem; letter-spacing: 0.2em;
+    text-transform: uppercase; color: var(--amber);
+    margin-bottom: 1.5rem;
+    display: flex; align-items: center; gap: 0.8rem;
+  }
+  .hero-eyebrow::before {
+    content: ''; display: block;
+    width: 2rem; height: 1.5px;
+    background: var(--amber);
+  }
+
+  .hero-headline {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(4rem, 8vw, 7.5rem);
+    line-height: 0.92;
+    letter-spacing: 0.02em;
+    margin-bottom: 2rem;
+    color: var(--ink);
+  }
+
+  .hero-headline em {
+    font-style: italic;
+    font-family: 'DM Serif Display', serif;
+    color: var(--amber);
+    display: block;
+  }
+
+  .hero-sub {
+    font-size: 1rem; font-weight: 300; line-height: 1.75;
+    color: var(--muted); max-width: 420px;
+    margin-bottom: 2.5rem;
+  }
+
+  .hero-cta {
+    display: flex; gap: 1rem; flex-wrap: wrap;
+  }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    padding: 0.85rem 2rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase;
+    text-decoration: none; border: none; cursor: pointer;
+    transition: all 0.25s;
+  }
+
+  .btn-primary {
+    background: var(--ink); color: var(--paper);
+  }
+  .btn-primary:hover { background: var(--amber); color: var(--ink); }
+
+  .btn-outline {
+    background: transparent; color: var(--ink);
+    border: 1.5px solid var(--border);
+  }
+  .btn-outline:hover { border-color: var(--ink); }
+
+  .hero-right {
+    position: relative; overflow: hidden;
+    background: var(--ink);
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .hero-art {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .grid-bg {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(245,240,232,0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(245,240,232,0.05) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  .hero-circle {
+    width: 300px; height: 300px;
+    border-radius: 50%;
+    border: 1px solid rgba(212,130,42,0.3);
+    position: absolute;
+    animation: pulse-ring 4s ease-in-out infinite;
+  }
+  .hero-circle:nth-child(2) { width: 450px; height: 450px; animation-delay: 0.8s; opacity: 0.5; }
+  .hero-circle:nth-child(3) { width: 600px; height: 600px; animation-delay: 1.6s; opacity: 0.25; }
+
+  @keyframes pulse-ring {
+    0%, 100% { transform: scale(1); opacity: 0.4; }
+    50% { transform: scale(1.05); opacity: 0.7; }
+  }
+
+  .hero-brain {
+    font-size: 6rem; position: relative; z-index: 2;
+    animation: float 5s ease-in-out infinite;
+    filter: drop-shadow(0 0 40px rgba(212,130,42,0.4));
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-16px); }
+  }
+
+  .hero-tags {
+    position: absolute; bottom: 2rem; left: 2rem; right: 2rem;
+    display: flex; flex-wrap: wrap; gap: 0.5rem;
+  }
+
+  .tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem; letter-spacing: 0.1em;
+    padding: 0.3rem 0.8rem;
+    border: 1px solid rgba(245,240,232,0.15);
+    color: rgba(245,240,232,0.5);
+    text-transform: uppercase;
+  }
+
+  /* ── SECTION COMMONS ── */
+  section { padding: 6rem 0; }
+
+  .section-inner {
+    max-width: 1200px; margin: 0 auto;
+    padding: 0 3rem;
+  }
+
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem; letter-spacing: 0.2em;
+    text-transform: uppercase; color: var(--amber);
+    margin-bottom: 1rem;
+  }
+
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    line-height: 1; letter-spacing: 0.02em;
+    margin-bottom: 1.5rem;
+  }
+
+  /* ── PRINCIPLES ── */
+  #principles { background: var(--cream); border-top: 1.5px solid var(--border); }
+
+  .principles-intro {
+    max-width: 600px; margin-bottom: 4rem;
+  }
+
+  .principles-intro p {
+    font-size: 1rem; font-weight: 300; line-height: 1.75; color: var(--muted);
+  }
+
+  .principles-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    border: 1.5px solid var(--border);
+  }
+
+  .principle-card {
+    padding: 2.5rem 2rem;
+    border-right: 1.5px solid var(--border);
+    position: relative;
+    transition: background 0.3s;
+  }
+  .principle-card:last-child { border-right: none; }
+  .principle-card:hover { background: var(--paper); }
+
+  .principle-number {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 4rem; line-height: 1;
+    color: var(--border); margin-bottom: 1.5rem;
+    display: block;
+  }
+
+  .principle-icon { font-size: 2rem; margin-bottom: 1rem; display: block; }
+
+  .principle-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.3rem; margin-bottom: 0.75rem;
+    color: var(--ink);
+  }
+
+  .principle-desc {
+    font-size: 0.88rem; line-height: 1.7; color: var(--muted); font-weight: 300;
+  }
+
+  /* ── PROMPTS ── */
+  #prompts { background: var(--paper); }
+
+  .prompts-header {
+    display: flex; justify-content: space-between; align-items: flex-end;
+    margin-bottom: 3rem; flex-wrap: wrap; gap: 1rem;
+  }
+
+  .prompt-filters {
+    display: flex; gap: 0.5rem; flex-wrap: wrap;
+  }
+
+  .filter-btn {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 0.45rem 1.1rem;
+    border: 1.5px solid var(--border);
+    background: transparent; color: var(--muted);
+    cursor: pointer; transition: all 0.2s;
+  }
+  .filter-btn:hover, .filter-btn.active {
+    background: var(--ink); color: var(--paper); border-color: var(--ink);
+  }
+
+  .prompts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 1.5px;
+    background: var(--border);
+    border: 1.5px solid var(--border);
+  }
+
+  .prompt-card {
+    background: var(--paper);
+    padding: 2rem;
+    position: relative;
+    transition: background 0.2s;
+    display: flex; flex-direction: column;
+  }
+  .prompt-card:hover { background: #faf7f1; }
+
+  .prompt-category {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--amber); margin-bottom: 1rem;
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+
+  .prompt-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.1rem; margin-bottom: 0.75rem; color: var(--ink);
+    line-height: 1.3;
+  }
+
+  .prompt-desc {
+    font-size: 0.83rem; line-height: 1.65; color: var(--muted); font-weight: 300;
+    margin-bottom: 1.5rem; flex: 1;
+  }
+
+  .prompt-box {
+    background: var(--ink);
+    padding: 1.2rem 1.4rem;
+    position: relative;
+    margin-top: auto;
+  }
+
+  .prompt-box-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem; letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--amber); margin-bottom: 0.6rem;
+  }
+
+  .prompt-text {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.78rem; line-height: 1.6; color: var(--cream);
+  }
+
+  .copy-btn {
+    position: absolute; top: 0.8rem; right: 0.8rem;
+    background: none; border: 1px solid rgba(245,240,232,0.2);
+    color: rgba(245,240,232,0.5); padding: 0.3rem 0.6rem;
+    font-family: 'DM Mono', monospace; font-size: 0.6rem;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .copy-btn:hover { background: var(--amber); color: var(--ink); border-color: var(--amber); }
+  .copy-btn.copied { background: var(--teal); color: white; border-color: var(--teal); }
+
+  /* ── MISTAKES ── */
+  #mistakes { background: var(--ink); border-top: 1.5px solid #2a2820; }
+
+  #mistakes .section-title { color: var(--paper); }
+  #mistakes .section-label { color: var(--amber); }
+
+  .mistakes-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr);
+    gap: 1.5px; background: #2a2820;
+    border: 1.5px solid #2a2820; margin-top: 3rem;
+  }
+
+  .mistake-card {
+    background: var(--ink); padding: 2.5rem;
+    display: flex; gap: 1.5rem;
+    transition: background 0.25s;
+  }
+  .mistake-card:hover { background: #1a1915; }
+
+  .mistake-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 3.5rem; line-height: 1; color: #2a2820;
+    flex-shrink: 0; width: 2.5rem;
+  }
+
+  .mistake-content {}
+
+  .mistake-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.05rem; color: var(--paper);
+    margin-bottom: 0.6rem;
+  }
+
+  .mistake-desc {
+    font-size: 0.83rem; line-height: 1.7; color: #8a8070; font-weight: 300;
+  }
+
+  .mistake-fix {
+    margin-top: 0.8rem;
+    font-family: 'DM Mono', monospace; font-size: 0.72rem;
+    letter-spacing: 0.05em; color: var(--teal-light);
+    display: flex; align-items: flex-start; gap: 0.5rem;
+  }
+  .mistake-fix::before { content: '→'; flex-shrink: 0; }
+
+  /* ── TIPS TICKER ── */
+  .ticker-section {
+    background: var(--amber); border-top: 2px solid var(--ink);
+    overflow: hidden; padding: 1rem 0;
+  }
+
+  .ticker-track {
+    display: flex; gap: 4rem;
+    white-space: nowrap;
+    animation: ticker 30s linear infinite;
+  }
+
+  @keyframes ticker {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  .ticker-item {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.2rem; letter-spacing: 0.08em;
+    color: var(--ink); flex-shrink: 0;
+    display: flex; align-items: center; gap: 1.5rem;
+  }
+  .ticker-dot { width: 6px; height: 6px; background: var(--ink); border-radius: 50%; display: inline-block; }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--ink); color: var(--cream);
+    padding: 4rem 0 2rem;
+    border-top: 1.5px solid #2a2820;
+  }
+
+  .footer-inner {
+    max-width: 1200px; margin: 0 auto;
+    padding: 0 3rem;
+    display: grid; grid-template-columns: 2fr 1fr 1fr;
+    gap: 4rem;
+  }
+
+  .footer-brand-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.2rem; letter-spacing: 0.05em;
+    color: var(--paper); margin-bottom: 1rem;
+  }
+
+  .footer-brand-name span { color: var(--amber); }
+
+  .footer-desc {
+    font-size: 0.85rem; line-height: 1.7; color: #6b6457; font-weight: 300;
+    max-width: 280px;
+  }
+
+  .footer-col-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--amber); margin-bottom: 1.5rem;
+  }
+
+  .footer-links { list-style: none; display: flex; flex-direction: column; gap: 0.6rem; }
+  .footer-links a {
+    font-size: 0.85rem; color: #6b6457; text-decoration: none;
+    transition: color 0.2s; font-weight: 300;
+  }
+  .footer-links a:hover { color: var(--paper); }
+
+  .footer-bottom {
+    max-width: 1200px; margin: 3rem auto 0;
+    padding: 1.5rem 3rem 0;
+    border-top: 1px solid #2a2820;
+    display: flex; justify-content: space-between;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem; letter-spacing: 0.1em;
+    color: #3a352e; text-transform: uppercase;
+  }
+
+  /* ── ANIMATIONS ── */
+  .fade-up {
+    opacity: 0; transform: translateY(24px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .fade-up.visible { opacity: 1; transform: translateY(0); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    .hero { grid-template-columns: 1fr; }
+    .hero-right { min-height: 300px; }
+    .principles-grid { grid-template-columns: 1fr; }
+    .principle-card { border-right: none; border-bottom: 1.5px solid var(--border); }
+    .mistakes-grid { grid-template-columns: 1fr; }
+    .footer-inner { grid-template-columns: 1fr; gap: 2rem; }
+    nav { padding: 1rem 1.5rem; }
+    .nav-links { display: none; }
+    .hero-left { padding: 4rem 1.5rem; }
+    .section-inner { padding: 0 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">Think<span>AI</span></a>
+  <ul class="nav-links">
+    <li><a href="#principles">Principles</a></li>
+    <li><a href="#prompts">Prompts</a></li>
+    <li><a href="#mistakes">Mistakes</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-left">
+    <div class="hero-eyebrow">A Guide to Smart AI Use</div>
+    <h1 class="hero-headline">
+      Don't Just<br>
+      <em>Use AI.</em><br>
+      Use It Well.
+    </h1>
+    <p class="hero-sub">AI is a thinking partner, not an answer machine. Learn how to ask better questions, think critically, and get results that actually matter.</p>
+    <div class="hero-cta">
+      <a href="#prompts" class="btn btn-primary">Explore Prompts →</a>
+      <a href="#principles" class="btn btn-outline">Learn the Principles</a>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="grid-bg"></div>
+    <div class="hero-art">
+      <div class="hero-circle"></div>
+      <div class="hero-circle"></div>
+      <div class="hero-circle"></div>
+      <div class="hero-brain">🧠</div>
+    </div>
+    <div class="hero-tags">
+      <span class="tag">Critical Thinking</span>
+      <span class="tag">Better Prompts</span>
+      <span class="tag">Fact-Checking</span>
+      <span class="tag">Privacy-Aware</span>
+      <span class="tag">Human-Led</span>
+    </div>
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker-section">
+  <div class="ticker-track" id="ticker">
+    <span class="ticker-item"><span class="ticker-dot"></span> Verify AI outputs — always</span>
+    <span class="ticker-item"><span class="ticker-dot"></span> Be specific with your prompts</span>
+    <span class="ticker-item"><span class="ticker-dot"></span> AI doesn't replace your judgment</span>
+    <span class="ticker-item"><span class="ticker-dot"></span> Keep sensitive data private</span>
+    <span class="ticker-item"><span class="ticker-dot"></span> Iterate and refine your questions</span>
+    <span class="ticker-item"><span class="ticker-dot"></span> AI is a tool — you're the expert</span>
+    <span class="ticker-item"><span class="ticker-dot"></span> Credit your sources and AI use</span>
+    <span class="ticker-item"><span class="ticker-dot"></span> Verify AI outputs — always</span>
+    <span class="ticker-item"><span class="ticker-dot"></span> Be specific with your prompts</span>
+    <span class="ticker-item"><span class="ticker-dot"></span> AI doesn't replace your judgment</span>
+    <span class="ticker-item"><span class="ticker-dot"></span> Keep sensitive data private</span>
+    <span class="ticker-item"><span class="ticker-dot"></span> Iterate and refine your questions</span>
+    <span class="ticker-item"><span class="ticker-dot"></span> AI is a tool — you're the expert</span>
+    <span class="ticker-item"><span class="ticker-dot"></span> Credit your sources and AI use</span>
+  </div>
+</div>
+
+<!-- PRINCIPLES -->
+<section id="principles">
+  <div class="section-inner">
+    <div class="principles-intro fade-up">
+      <div class="section-label">Core Principles</div>
+      <h2 class="section-title">How to Think<br>About AI</h2>
+      <p>Before you type a single prompt, understand these foundations. They're what separates people who get shallow outputs from those who get real, useful results.</p>
+    </div>
+    <div class="principles-grid">
+      <div class="principle-card fade-up">
+        <span class="principle-number">01</span>
+        <span class="principle-icon">🎯</span>
+        <h3 class="principle-title">Be the Pilot, Not the Passenger</h3>
+        <p class="principle-desc">AI is powerful but directionless without you. You set the goal, define the context, and judge the result. Never hand over your critical thinking — stay in control of every step.</p>
+      </div>
+      <div class="principle-card fade-up">
+        <span class="principle-number">02</span>
+        <span class="principle-icon">🔍</span>
+        <h3 class="principle-title">Verify Before You Trust</h3>
+        <p class="principle-desc">AI can hallucinate facts, dates, and sources with complete confidence. Treat AI output like a first draft from a smart intern — impressive but always needs checking before it leaves your desk.</p>
+      </div>
+      <div class="principle-card fade-up">
+        <span class="principle-number">03</span>
+        <span class="principle-icon">🔐</span>
+        <h3 class="principle-title">Guard Your Privacy</h3>
+        <p class="principle-desc">Never share passwords, personal ID numbers, medical records, or company secrets with AI tools. Even well-intentioned systems can expose data. Keep sensitive information off the table.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROMPTS -->
+<section id="prompts">
+  <div class="section-inner">
+    <div class="prompts-header fade-up">
+      <div>
+        <div class="section-label">Prompt Library</div>
+        <h2 class="section-title">Prompts That<br>Actually Work</h2>
+      </div>
+      <div class="prompt-filters">
+        <button class="filter-btn active" onclick="filterPrompts('all', this)">All</button>
+        <button class="filter-btn" onclick="filterPrompts('learning', this)">Learning</button>
+        <button class="filter-btn" onclick="filterPrompts('writing', this)">Writing</button>
+        <button class="filter-btn" onclick="filterPrompts('work', this)">Work</button>
+        <button class="filter-btn" onclick="filterPrompts('thinking', this)">Thinking</button>
+      </div>
+    </div>
+
+    <div class="prompts-grid" id="promptsGrid">
+
+      <div class="prompt-card" data-category="learning">
+        <div class="prompt-category">📚 Learning</div>
+        <h3 class="prompt-title">Learn Any Concept Deeply</h3>
+        <p class="prompt-desc">Get a structured breakdown of any topic with clear analogies. Great for students or self-learners tackling something new.</p>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Try this →</div>
+          <div class="prompt-text">Explain [topic] to me like I'm a curious 16-year-old. Start with the core idea in one sentence, then give me three real-world examples, and end with why it matters today.</div>
+          <button class="copy-btn" onclick="copyPrompt(this)">Copy</button>
+        </div>
+      </div>
+
+      <div class="prompt-card" data-category="thinking">
+        <div class="prompt-category">💡 Thinking</div>
+        <h3 class="prompt-title">Challenge Your Own Ideas</h3>
+        <p class="prompt-desc">Use AI to steelman or stress-test your arguments. This is critical thinking at its best — don't let AI agree with everything you say.</p>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Try this →</div>
+          <div class="prompt-text">I believe [your opinion]. Play devil's advocate — give me the three strongest arguments against this view, and tell me which one you think is hardest to counter.</div>
+          <button class="copy-btn" onclick="copyPrompt(this)">Copy</button>
+        </div>
+      </div>
+
+      <div class="prompt-card" data-category="writing">
+        <div class="prompt-category">✍️ Writing</div>
+        <h3 class="prompt-title">Sharpen Your Writing</h3>
+        <p class="prompt-desc">Instead of asking AI to write for you, use it as an editor. You keep your voice; AI helps you communicate it better.</p>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Try this →</div>
+          <div class="prompt-text">Here's something I wrote: [paste text]. Don't rewrite it. Instead, point out: 1) where I'm unclear, 2) where I repeat myself, 3) my strongest sentence. Keep my voice.</div>
+          <button class="copy-btn" onclick="copyPrompt(this)">Copy</button>
+        </div>
+      </div>
+
+      <div class="prompt-card" data-category="work">
+        <div class="prompt-category">💼 Work</div>
+        <h3 class="prompt-title">Prepare for a Difficult Meeting</h3>
+        <p class="prompt-desc">Use AI as a thinking partner before high-stakes conversations. Walk in prepared for every angle.</p>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Try this →</div>
+          <div class="prompt-text">I have a meeting about [topic] with [who]. My goal is [outcome]. What are the likely objections or concerns they'll raise? How should I respond to each one?</div>
+          <button class="copy-btn" onclick="copyPrompt(this)">Copy</button>
+        </div>
+      </div>
+
+      <div class="prompt-card" data-category="learning">
+        <div class="prompt-category">📚 Learning</div>
+        <h3 class="prompt-title">Build a Study Plan</h3>
+        <p class="prompt-desc">Stop aimlessly studying. Get a structured, time-bound plan tailored to your actual goal and starting point.</p>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Try this →</div>
+          <div class="prompt-text">I want to learn [skill] in [timeframe]. I'm a complete beginner. Create a weekly study plan with specific resources and daily tasks. Be realistic about what I can achieve.</div>
+          <button class="copy-btn" onclick="copyPrompt(this)">Copy</button>
+        </div>
+      </div>
+
+      <div class="prompt-card" data-category="thinking">
+        <div class="prompt-category">💡 Thinking</div>
+        <h3 class="prompt-title">Make a Better Decision</h3>
+        <p class="prompt-desc">Structured decision-making with AI as a sounding board. Surfaces things you might have missed while keeping you in the driver's seat.</p>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Try this →</div>
+          <div class="prompt-text">I'm deciding between [option A] and [option B]. My priorities are [list]. What am I probably not considering? Don't tell me which to choose — help me think more clearly.</div>
+          <button class="copy-btn" onclick="copyPrompt(this)">Copy</button>
+        </div>
+      </div>
+
+      <div class="prompt-card" data-category="work">
+        <div class="prompt-category">💼 Work</div>
+        <h3 class="prompt-title">Summarize Long Content</h3>
+        <p class="prompt-desc">Feed AI a report, article, or document and extract exactly what you need — without losing the nuances that matter.</p>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Try this →</div>
+          <div class="prompt-text">[Paste document]. Summarize this in three parts: 1) The main argument in one sentence, 2) The three most important facts or findings, 3) What action this implies I should take.</div>
+          <button class="copy-btn" onclick="copyPrompt(this)">Copy</button>
+        </div>
+      </div>
+
+      <div class="prompt-card" data-category="writing">
+        <div class="prompt-category">✍️ Writing</div>
+        <h3 class="prompt-title">Write a Cold Email That Gets Replies</h3>
+        <p class="prompt-desc">Cold outreach is hard. Use this prompt to draft something genuine, specific, and human — not a generic blast.</p>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Try this →</div>
+          <div class="prompt-text">Write a cold email to [person/role] at [company]. My goal is [specific ask]. I want it to feel personal and show I've done research. Keep it under 120 words and avoid all clichés.</div>
+          <button class="copy-btn" onclick="copyPrompt(this)">Copy</button>
+        </div>
+      </div>
+
+      <div class="prompt-card" data-category="thinking">
+        <div class="prompt-category">💡 Thinking</div>
+        <h3 class="prompt-title">Fact-Check an AI Answer</h3>
+        <p class="prompt-desc">Never trust AI blindly. This meta-prompt makes AI tell you exactly where it might be wrong — and what to check.</p>
+        <div class="prompt-box">
+          <div class="prompt-box-label">Try this →</div>
+          <div class="prompt-text">You just told me [paste previous AI answer]. Now: what in that answer are you least confident about? What should I independently verify? Are there any claims that might be outdated?</div>
+          <button class="copy-btn" onclick="copyPrompt(this)">Copy</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- MISTAKES -->
+<section id="mistakes">
+  <div class="section-inner">
+    <div class="fade-up">
+      <div class="section-label">Common Pitfalls</div>
+      <h2 class="section-title" style="color: var(--paper);">Mistakes People<br>Make With AI</h2>
+    </div>
+    <div class="mistakes-grid">
+      <div class="mistake-card fade-up">
+        <div class="mistake-num">01</div>
+        <div class="mistake-content">
+          <h3 class="mistake-title">Vague, One-Line Prompts</h3>
+          <p class="mistake-desc">Typing "write me an essay" and expecting a masterpiece. AI needs context — who's it for, what's the goal, what tone, how long?</p>
+          <div class="mistake-fix">Give AI a role, context, constraints, and a clear goal in every prompt.</div>
+        </div>
+      </div>
+      <div class="mistake-card fade-up">
+        <div class="mistake-num">02</div>
+        <div class="mistake-content">
+          <h3 class="mistake-title">Accepting the First Draft</h3>
+          <p class="mistake-desc">The first AI response is rarely the best one. Great results come from iterating — asking follow-up questions and pushing further.</p>
+          <div class="mistake-fix">Say "That's close — now make it more concise" or "Give me a bolder version."</div>
+        </div>
+      </div>
+      <div class="mistake-card fade-up">
+        <div class="mistake-num">03</div>
+        <div class="mistake-content">
+          <h3 class="mistake-title">Not Verifying AI "Facts"</h3>
+          <p class="mistake-desc">AI sounds authoritative even when it's wrong. It can cite fake papers, invent statistics, and misquote real people — all confidently.</p>
+          <div class="mistake-fix">For anything important, cross-check with a reliable source. Never use AI as your only reference.</div>
+        </div>
+      </div>
+      <div class="mistake-card fade-up">
+        <div class="mistake-num">04</div>
+        <div class="mistake-content">
+          <h3 class="mistake-title">Sharing Private Information</h3>
+          <p class="mistake-desc">Pasting passwords, customer data, or confidential business strategies into public AI tools is a serious security risk.</p>
+          <div class="mistake-fix">Anonymize or remove sensitive data before using AI tools. Use enterprise versions for sensitive work.</div>
+        </div>
+      </div>
+      <div class="mistake-card fade-up">
+        <div class="mistake-num">05</div>
+        <div class="mistake-content">
+          <h3 class="mistake-title">Outsourcing Your Thinking</h3>
+          <p class="mistake-desc">Using AI to think for you instead of with you. Your judgment, experience, and ethical reasoning aren't replaceable.</p>
+          <div class="mistake-fix">Use AI to explore and expand ideas — then apply your own judgment to decide and act.</div>
+        </div>
+      </div>
+      <div class="mistake-card fade-up">
+        <div class="mistake-num">06</div>
+        <div class="mistake-content">
+          <h3 class="mistake-title">Ignoring Bias in Outputs</h3>
+          <p class="mistake-desc">AI reflects patterns in its training data, which means it can reproduce biases around culture, gender, perspective, and more.</p>
+          <div class="mistake-fix">Ask AI to consider multiple perspectives. Be especially critical when outputs feel "too agreeable."</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div>
+      <div class="footer-brand-name">Think<span>AI</span></div>
+      <p class="footer-desc">A resource for anyone who wants to use artificial intelligence thoughtfully, effectively, and ethically.</p>
+    </div>
+    <div>
+      <div class="footer-col-title">On This Site</div>
+      <ul class="footer-links">
+        <li><a href="#principles">Principles</a></li>
+        <li><a href="#prompts">Prompt Library</a></li>
+        <li><a href="#mistakes">Common Mistakes</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Remember</div>
+      <ul class="footer-links">
+        <li><a href="#">AI is a tool, not a truth-teller</a></li>
+        <li><a href="#">Always verify important facts</a></li>
+        <li><a href="#">Your judgment matters most</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2025 ThinkAI — Use It Wisely</span>
+    <span>Made for curious minds</span>
+  </div>
+</footer>
+
+<script>
+// Copy prompt functionality
+function copyPrompt(btn) {
+  const text = btn.closest('.prompt-box').querySelector('.prompt-text').textContent.trim();
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = 'Copy';
+      btn.classList.remove('copied');
+    }, 2000);
+  });
+}
+
+// Filter prompts
+function filterPrompts(category, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.prompt-card').forEach(card => {
+    if (category === 'all' || card.dataset.category === category) {
+      card.style.display = 'flex';
+    } else {
+      card.style.display = 'none';
+    }
+  });
+}
+
+// Scroll animations
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((entry, i) => {
+    if (entry.isIntersecting) {
+      setTimeout(() => entry.target.classList.add('visible'), i * 80);
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
